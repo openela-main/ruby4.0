@@ -1,0 +1,26 @@
+From 099da884fe95ccf6c684a1563ed1c4b0fd8e1196 Mon Sep 17 00:00:00 2001
+From: Sorah Fukumori <her@sorah.jp>
+Date: Thu, 25 Dec 2025 21:35:15 +0900
+Subject: [PATCH] test_box: avoid failure with --program-suffix (#15734)
+
+---
+ test/ruby/test_box.rb | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/test/ruby/test_box.rb b/test/ruby/test_box.rb
+index a531afa679..28c9dd02b0 100644
+--- a/test/ruby/test_box.rb
++++ b/test/ruby/test_box.rb
+@@ -1,10 +1,11 @@
+ # frozen_string_literal: true
+ 
+ require 'test/unit'
++require 'rbconfig'
+ 
+ class TestBox < Test::Unit::TestCase
+   EXPERIMENTAL_WARNING_LINE_PATTERNS = [
+-    /ruby(\.exe)?: warning: Ruby::Box is experimental, and the behavior may change in the future!/,
++    /#{RbConfig::CONFIG["ruby_install_name"] || "ruby"}(\.exe)?: warning: Ruby::Box is experimental, and the behavior may change in the future!/,
+     %r{See https://docs.ruby-lang.org/en/(master|\d\.\d)/Ruby/Box.html for known issues, etc.}
+   ]
+   ENV_ENABLE_BOX = {'RUBY_BOX' => '1', 'TEST_DIR' => __dir__}

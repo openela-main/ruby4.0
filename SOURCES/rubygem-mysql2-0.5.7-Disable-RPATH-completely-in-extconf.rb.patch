@@ -1,0 +1,24 @@
+From 2671d69d0f7df595c026152e11f74d1f2d70a4f4 Mon Sep 17 00:00:00 2001
+From: Jarek Prokop <jprokop@redhat.com>
+Date: Fri, 6 Feb 2026 14:40:59 +0100
+Subject: [PATCH] Disable RPATH completely in extconf.rb.
+
+Cannot be set simply from configure script of Ruby itself.
+Just disable the entire branch that sets any rpath.
+---
+ ext/mysql2/extconf.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/mysql2/extconf.rb b/ext/mysql2/extconf.rb
+index 147b998..16b1fc0 100644
+--- a/ext/mysql2/extconf.rb
++++ b/ext/mysql2/extconf.rb
+@@ -291,7 +291,7 @@ if RUBY_PLATFORM =~ /mswin|mingw/ && !defined?(RubyInstaller)
+     # Let's do it!
+     Rake::Task[vendordll].invoke
+   end
+-else
++elsif false
+   case explicit_rpath = with_config('mysql-rpath')
+   when true
+     abort "-----\nOption --with-mysql-rpath must have an argument\n-----"
