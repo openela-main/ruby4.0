@@ -1,6 +1,6 @@
 %global major_version 4
 %global minor_version 0
-%global teeny_version 1
+%global teeny_version 3
 %global major_minor_version %{major_version}.%{minor_version}
 
 %global ruby_version %{major_minor_version}.%{teeny_version}
@@ -37,19 +37,19 @@
 ## BUNDLED_GEMS_VERSIONS
 
 # Bundled libraries versions
-%global rubygems_version 4.0.3
+%global rubygems_version 4.0.6
 %global rubygems_molinillo_version 0.8.0
 %global rubygems_net_http_version 0.7.0
 %global rubygems_net_protocol_version 0.2.2
 %global rubygems_optparse_version 0.8.0
-%global rubygems_resolv_version 0.6.2
+%global rubygems_resolv_version 0.7.0
 %global rubygems_securerandom_version 0.4.1
 %global rubygems_timeout_version 0.4.4
 %global rubygems_tsort_version 0.2.0
 %global rubygems_uri_version 1.1.1
 
 # Default gems.
-%global bundler_version 4.0.3
+%global bundler_version 4.0.6
 %global bundler_connection_pool_version 2.5.4
 %global bundler_fileutils_version 1.8.0
 %global bundler_net_http_persistent_version 4.0.6
@@ -64,7 +64,7 @@
 %global did_you_mean_version 2.0.0
 %global digest_version 3.2.1
 %global english_version 0.8.1
-%global erb_version 6.0.1
+%global erb_version 6.0.1.1
 %global error_highlight_version 0.7.1
 %global etc_version 1.4.6
 %global fcntl_version 1.3.0
@@ -84,7 +84,7 @@
 %global optparse_version 0.8.1
 %global pp_version 0.6.3
 %global prettyprint_version 0.2.0
-%global prism_version 1.8.0
+%global prism_version 1.8.1
 %global psych_version 5.3.1
 %global resolv_version 0.7.0
 %global ruby2_keywords_version 0.0.5
@@ -93,7 +93,7 @@
 %global singleton_version 0.3.0
 %global stringio_version 3.2.0
 %global strscan_version 3.1.6
-%global syntax_suggest_version 2.0.2
+%global syntax_suggest_version 2.0.3
 %global tempfile_version 0.3.1
 %global time_version 0.4.2
 %global timeout_version 0.6.0
@@ -104,7 +104,7 @@
 %global weakref_version 0.1.4
 %global win32_registry_version 0.1.2
 %global yaml_version 0.4.0
-%global zlib_version 3.2.2
+%global zlib_version 3.2.3
 
 # Bundled gems.
 %global abbrev_version 0.1.2
@@ -130,7 +130,7 @@
 %global ostruct_version 0.6.3
 %global power_assert_version 3.0.1
 %global prime_version 0.1.4
-%global pstore_version 0.2.0
+%global pstore_version 0.2.1
 %global racc_version 1.8.1
 %global rake_version 13.3.1
 %global rbs_version 3.10.0
@@ -202,7 +202,7 @@
 Summary: An interpreter of object-oriented scripting language
 Name: ruby4.0
 Version: %{ruby_version}%{?development_release}
-Release: 33%{?dist}
+Release: 34%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -335,6 +335,12 @@ Patch10: ruby-4.0.1-test_box-avoid-failure-with-program-suffix.patch
 # option in Ruby's main build.
 # https://github.com/brianmario/mysql2/issues/1201
 Patch11: rubygem-mysql2-0.5.7-Disable-RPATH-completely-in-extconf.rb.patch
+# CVE-2026-33210 
+# Fix for Denial of Service or Information Disclosure 
+# via format string injection
+# in Ruby JSON
+# https://github.com/ruby/json/commit/393b41c3e5f87491e1e34fa59fa78ff6fa179a74
+Patch12: ruby-4.0.3-Fix-a-format-string-injection-vulnerability.patch
 
 %{?with_rubypick:Suggests: rubypick}
 
@@ -498,6 +504,7 @@ popd
 %patch 7 -p1
 %patch 8 -p1
 %patch 10 -p1
+%patch 12 -p1
 
 # Provide an example of usage of the tapset:
 cp -a %{SOURCE3} .
@@ -1624,7 +1631,6 @@ make -C %{_vpath_builddir} runruby TESTRUN_SCRIPT=" \
 
 %files doc -f .ruby-doc.en -f .ruby-doc.ja
 %doc README.md
-%doc ChangeLog
 %{?with_systemtap:%doc ruby-exercise.stp}
 %{_datadir}/ri
 
@@ -1640,6 +1646,16 @@ make -C %{_vpath_builddir} runruby TESTRUN_SCRIPT=" \
 %{_libdir}/pkgconfig/%{pkgname}-%{major_minor_version}.pc
 
 %changelog
+* Wed Apr 29 2026 Tomas Juhasz <tjuhasz@redhat.com> - 4.0.3-34
+- Upgrade to Ruby 4.0.3.
+  Resolves: RHEL-171239
+- Fix ERB: Arbitrary code execution via bypass
+ (CVE-2026-41316)
+  Resolves: RHEL-170910
+- Fix JSON: Denial of Service or Information Disclosure via format string injection
+ (CVE-2026-33210)
+ Resolves: RHEL-173457
+
 * Thu Feb 05 2026 Jarek Prokop <jprokop@redhat.com> - 4.0.1-33
 - Initial package.
   Resolves: RHEL-133550
