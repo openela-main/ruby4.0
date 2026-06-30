@@ -202,7 +202,7 @@
 Summary: An interpreter of object-oriented scripting language
 Name: ruby4.0
 Version: %{ruby_version}%{?development_release}
-Release: 34%{?dist}
+Release: 35%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -341,6 +341,27 @@ Patch11: rubygem-mysql2-0.5.7-Disable-RPATH-completely-in-extconf.rb.patch
 # in Ruby JSON
 # https://github.com/ruby/json/commit/393b41c3e5f87491e1e34fa59fa78ff6fa179a74
 Patch12: ruby-4.0.3-Fix-a-format-string-injection-vulnerability.patch
+# CVE-2026-42245
+# Fix Net::IMAP ResponseReader quadratic complexity vulnerability
+# Advisory: https://github.com/advisories/GHSA-q2mw-fvj9-vvcw
+# Sourced from:
+# - https://github.com/ruby/net-imap/commit/341ab628
+# - https://github.com/ruby/net-imap/commit/49c516d6
+# - https://github.com/ruby/net-imap/commit/6f82e28f
+Patch13: rubygem-net-imap-0.6.2-ResponseReader-quadratic-complexity-CVE-2026-42245.patch
+# CVE-2026-42246
+# Fix Net::IMAP STARTTLS stripping vulnerability
+# Advisory: https://github.com/advisories/GHSA-vcgp-9326-pqcp
+# Sourced from:
+# - https://github.com/ruby/net-imap/commit/62eea6ff
+# - https://github.com/ruby/net-imap/commit/24d5c773
+Patch14: rubygem-net-imap-0.6.2-STARTTLS-stripping-vulnerability-CVE-2026-42246.patch
+# CVE-2026-42258
+# Fix Net::IMAP command injection vulnerability via unvalidated Symbol arguments
+# Advisory: https://github.com/advisories/GHSA-75xq-5h9v-w6px
+# Sourced from:
+# - https://github.com/ruby/net-imap/commit/9db3e9d
+Patch15: rubygem-net-imap-0.6.2-flag-symbol-validation-CVE-2026-42258.patch
 
 %{?with_rubypick:Suggests: rubypick}
 
@@ -505,6 +526,12 @@ popd
 %patch 8 -p1
 %patch 10 -p1
 %patch 12 -p1
+
+pushd .bundle/gems/net-imap-%{net_imap_version}
+%patch 13 -p1
+%patch 14 -p1
+%patch 15 -p1
+popd
 
 # Provide an example of usage of the tapset:
 cp -a %{SOURCE3} .
@@ -1646,6 +1673,15 @@ make -C %{_vpath_builddir} runruby TESTRUN_SCRIPT=" \
 %{_libdir}/pkgconfig/%{pkgname}-%{major_minor_version}.pc
 
 %changelog
+* Wed Jun 10 2026 Tomas Juhasz <tjuhasz@redhat.com> - 4.0.3-35
+- Fix Net::IMAP ResponseReader quadratic complexity vulnerability (CVE-2026-42245)
+  Includes core fix plus additional performance optimizations 
+  Resolves: RHEL-181675
+- Fix Net::IMAP STARTTLS stripping vulnerability (CVE-2026-42246)
+  Resolves: RHEL-181767
+- Fix Net::IMAP command injection vulnerability via unvalidated Symbol arguments (CVE-2026-42258)
+  Resolves: RHEL-181793
+
 * Wed Apr 29 2026 Tomas Juhasz <tjuhasz@redhat.com> - 4.0.3-34
 - Upgrade to Ruby 4.0.3.
   Resolves: RHEL-171239
