@@ -201,7 +201,7 @@
 Summary: An interpreter of object-oriented scripting language
 Name: ruby4.0
 Version: %{ruby_version}%{?development_release}
-Release: 36%{?dist}
+Release: 37%{?dist}
 # Licenses, which are likely not included in binary RPMs:
 # Apache-2.0:
 #   benchmark/gc/redblack.rb
@@ -341,6 +341,12 @@ Patch11: rubygem-mysql2-0.5.7-Disable-RPATH-completely-in-extconf.rb.patch
 # in Ruby JSON
 # https://github.com/ruby/json/commit/393b41c3e5f87491e1e34fa59fa78ff6fa179a74
 Patch12: ruby-4.0.3-Fix-a-format-string-injection-vulnerability.patch
+# Fix memory exhaustion via unknown DNS resource types in resolv. (CVE-2026-80212)
+# Backported from
+# https://github.com/ruby/resolv/commit/6393c628b224d0234ef915813c0977e11ebe57ea
+Patch13: rubygem-resolv-0.7.2-Do-Not-Register-Unknown-DNS-Types-CVE-2026-80212.patch
+# Same as Patch13, but applied atop of the bundled rubygems v4.0.16.
+Patch14: rubygems-resolv-0.7.2-Do-Not-Register-Unknown-DNS-Types-CVE-2026-80212.patch
 
 %{?with_rubypick:Suggests: rubypick}
 
@@ -504,6 +510,8 @@ popd
 %patch 8 -p1
 %patch 10 -p1
 %patch 12 -p1
+%patch 13 -p1
+%patch 14 -p1
 
 # Provide an example of usage of the tapset:
 cp -a %{SOURCE3} .
@@ -1636,6 +1644,12 @@ make -C %{_vpath_builddir} runruby TESTRUN_SCRIPT=" \
 %{_libdir}/pkgconfig/%{pkgname}-%{major_minor_version}.pc
 
 %changelog
+* Tue Sep 01 2026 RHEL Packaging Agent <redhat-ymir-agent@redhat.com> - 4.0.6-37
+- Fix resolv: do not register on-demand classes for unknown DNS
+  types and SvcParamKeys to prevent memory exhaustion
+  (CVE-2026-80212)
+  Resolves: RHEL-252032
+
 * Wed Jul 22 2026 Jarek Prokop <jprokop@redhat.com> - 4.0.6-36
 - Upgrade to Ruby 4.0.6.
   Resolves: RHEL-211310
